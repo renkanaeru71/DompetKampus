@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DompetKampus — Student Finance Dashboard</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <!-- ============================================================
+    SIDEBAR KIRI
+  ============================================================ -->
+  <aside class="sidebar" role="navigation" aria-label="Menu utama">
+
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <div class="logo-icon" aria-hidden="true">👛</div>
+      <div class="logo-text">Dompet<span>Kampus</span></div>
+    </div>
+
+    <!-- Navigasi -->
+    <div class="nav-label">Menu</div>
+
+    <div class="nav-item active" data-section="overview" role="button" tabindex="0">
+      <span class="nav-icon" aria-hidden="true">🏠</span>
+      <span>Overview</span>
+    </div>
+    <div class="nav-item" data-section="transaksi" role="button" tabindex="0">
+      <span class="nav-icon" aria-hidden="true">💳</span>
+      <span>Transaksi</span>
+    </div>
+    <div class="nav-item" data-section="target" role="button" tabindex="0">
+      <span class="nav-icon" aria-hidden="true">🎯</span>
+      <span>Target Tabungan</span>
+    </div>
+
+    <!-- Tombol Tambah Transaksi -->
+    <button class="btn-add-sidebar" id="btnOpenModal" aria-label="Tambah transaksi baru">
+      <span aria-hidden="true">＋</span>
+      <span>Tambah Transaksi</span>
+    </button>
+
+    <!-- Profil pengguna -->
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar" aria-hidden="true">RP</div>
+        <div>
+          <div class="user-name">Rizky Pratama</div>
+          <div class="user-role">Mahasiswa · Sem. 5</div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ============================================================
+    KOLOM KANAN
+  ============================================================ -->
+  <div class="right-col">
+
+    <!-- Top Bar -->
+    <header class="topbar" role="banner">
+      <!-- Judul halaman — diperbarui JS saat navigasi -->
+      <div class="topbar-title" id="topbarTitle">
+        Overview <span>📊</span>
+      </div>
+
+      <!-- Kotak Pencarian — filter tabel via JS -->
+      <div class="search-box" role="search">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input
+          type="search"
+          class="search-input"
+          id="searchInput"
+          placeholder="Cari transaksi…"
+          aria-label="Cari transaksi"
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- Profil pengguna di topbar -->
+      <div class="topbar-profile" aria-label="Profil pengguna">
+        <div>
+          <div class="profile-name">Rizky Pratama</div>
+          <div class="profile-role">Mahasiswa Informatika</div>
+        </div>
+        <div class="profile-avatar" aria-hidden="true">RP</div>
+      </div>
+    </header>
+
+    <!-- Konten Utama -->
+    <main class="content" role="main">
+
+      <!-- ══════════════════════════════════════════════════
+           SECTION 1: OVERVIEW
+           Berisi KPI cards + bar chart + tabel transaksi
+      ══════════════════════════════════════════════════ -->
+      <section
+        class="page-section active"
+        data-section="overview"
+        aria-label="Halaman Overview"
+      >
+
+        <!-- ── 4 Kartu KPI ── -->
+        <div class="kpi-grid" role="region" aria-label="Ringkasan keuangan">
+
+          <div class="kpi-card c-blue">
+            <div class="kpi-icon" aria-hidden="true">💵</div>
+            <div class="kpi-label">Total Saldo</div>
+            <div class="kpi-value" id="kpiSaldo">Rp 0</div>
+            <span class="kpi-badge">Saldo Aktif</span>
+          </div>
+
+          <div class="kpi-card c-green">
+            <div class="kpi-icon" aria-hidden="true">📥</div>
+            <div class="kpi-label">Total Pemasukan</div>
+            <div class="kpi-value" id="kpiIncome">Rp 0</div>
+            <span class="kpi-badge" id="kpiIncomeBadge">0 transaksi</span>
+          </div>
+
+          <div class="kpi-card c-red">
+            <div class="kpi-icon" aria-hidden="true">📤</div>
+            <div class="kpi-label">Total Pengeluaran</div>
+            <div class="kpi-value" id="kpiExpense">Rp 0</div>
+            <span class="kpi-badge" id="kpiExpenseBadge">0 transaksi</span>
+          </div>
+
+          <div class="kpi-card c-yellow">
+            <div class="kpi-icon" aria-hidden="true">🍔</div>
+            <div class="kpi-label">Uang Jajan Tersisa</div>
+            <div class="kpi-value" id="kpiJajan">Rp 0</div>
+            <span class="kpi-badge" id="kpiJajanBadge">dari anggaran</span>
+          </div>
+
+        </div>
+        <!-- /kpi-grid -->
+
+        <!-- ── Baris Tengah: Chart + Tabel ── -->
+        <div class="mid-row">
+
+          <!-- Panel Bar Chart Horizontal -->
+          <div class="panel" role="region" aria-label="Grafik pengeluaran per kategori">
+            <div class="panel-title">
+              <div class="panel-icon" aria-hidden="true">📊</div>
+              Per Kategori
+            </div>
+            <!-- Diisi oleh renderChart() -->
+            <div id="chartBody"></div>
+          </div>
+
+          <!-- Panel Tabel Transaksi (di Overview) -->
+          <div class="panel" role="region" aria-label="Daftar transaksi">
+            <div class="table-head-row">
+              <div class="panel-title" style="margin-bottom:0;">
+                <div class="panel-icon" aria-hidden="true">📋</div>
+                Transaksi Terakhir
+              </div>
+              <span class="badge-count" id="tableCount" aria-live="polite">0 transaksi</span>
+            </div>
+
+            <table aria-label="Tabel transaksi">
+              <thead>
+                <tr>
+                  <th>Nama Transaksi</th>
+                  <th>Kategori</th>
+                  <th>Tipe</th>
+                  <th style="text-align:right;">Nominal</th>
+                  <th style="text-align:right;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="transactionBody">
+                <!-- Baris sentinel saat kosong -->
+                <tr id="emptyRow" class="empty-row">
+                  <td colspan="5">📭 Belum ada transaksi. Klik "+ Tambah Transaksi" untuk mulai.</td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+          <!-- /panel tabel overview -->
+
+        </div>
+        <!-- /mid-row -->
+
+      </section>
+      <!-- /SECTION OVERVIEW -->
+
+
+      <!-- ══════════════════════════════════════════════════
+           SECTION 2: TRANSAKSI
+           Hanya tabel — diperbesar memenuhi layar
+      ══════════════════════════════════════════════════ -->
+      <section
+        class="page-section page-transaksi"
+        data-section="transaksi"
+        aria-label="Halaman Transaksi"
+      >
+
+        <div class="panel" role="region" aria-label="Semua transaksi" style="width:100%;">
+          <div class="table-head-row">
+            <div class="panel-title" style="margin-bottom:0;">
+              <div class="panel-icon" aria-hidden="true">💳</div>
+              Semua Transaksi
+            </div>
+            <!-- Badge count — disinkron oleh renderTable() -->
+            <span class="badge-count" id="tableCountTx" aria-live="polite">0 transaksi</span>
+          </div>
+
+          <table aria-label="Tabel semua transaksi" style="margin-top:4px;">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nama Transaksi</th>
+                <th>Kategori</th>
+                <th>Tipe</th>
+                <th style="text-align:right;">Nominal</th>
+                <th style="text-align:right;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="transactionBodyFull">
+              <tr id="emptyRowFull" class="empty-row">
+                <td colspan="6">📭 Belum ada transaksi. Klik "+ Tambah Transaksi" untuk mulai.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+      <!-- /SECTION TRANSAKSI -->
+
+
+      <!-- ══════════════════════════════════════════════════
+           SECTION 3: TARGET TABUNGAN
+           Progress bar kapsul per target
+      ══════════════════════════════════════════════════ -->
+      <section
+        class="page-section"
+        data-section="target"
+        aria-label="Halaman Target Tabungan"
+      >
+
+        <!-- Header ringkasan + tombol Tambah Target -->
+        <div class="target-header">
+          <div>
+            <div class="target-header-title">🎯 Target Tabungan Kamu</div>
+            <div class="target-header-sub">Pantau progres setiap tujuan keuanganmu</div>
+          </div>
+          <!-- Tombol ini membuka modal form tambah target baru -->
+          <button class="btn-add-sidebar" id="btnOpenAddTarget" type="button"
+            style="padding:10px 18px;font-size:13px;margin-top:0;">
+            ＋ Tambah Target
+          </button>
+        </div>
+
+        <!-- Grid kartu progress bar kapsul -->
+        <div class="target-grid" id="targetGrid">
+          <!-- Diisi oleh renderTargets() -->
+        </div>
+
+        <!-- Ringkasan total di bawah -->
+        <div class="target-summary" id="targetSummary"></div>
+
+      </section>
+      <!-- /SECTION TARGET TABUNGAN -->
+
+    </main>
+  </div>
+  <!-- /right-col -->
+
+  <!-- ============================================================
+    MODAL TAMBAH TRANSAKSI
+  ============================================================ -->
+  <div class="overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">➕ Tambah Transaksi</div>
+        <button class="btn-close-modal" id="btnCloseModal" aria-label="Tutup modal">✕</button>
+      </div>
+
+      <!-- Form -->
+      <div class="form-group">
+        <label class="form-label" for="fNama">Nama Transaksi</label>
+        <input
+          type="text"
+          class="form-input"
+          id="fNama"
+          placeholder="cth: Makan Siang, Gaji Freelance…"
+          maxlength="80"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="fNominal">Nominal (Rp)</label>
+        <input
+          type="number"
+          class="form-input"
+          id="fNominal"
+          placeholder="cth: 25000"
+          min="1"
+          step="500"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="fKategori">Kategori</label>
+        <select class="form-select" id="fKategori">
+          <option value="makan">🍜 Makan</option>
+          <option value="transport">🚌 Transport</option>
+          <option value="hiburan">🎮 Hiburan</option>
+          <option value="belanja">🛒 Belanja</option>
+          <option value="pendidikan">📚 Pendidikan</option>
+          <option value="lainnya">📦 Lainnya</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tipe Transaksi</label>
+        <div class="type-toggle" role="group" aria-label="Pilih tipe transaksi">
+          <button
+            class="type-btn sel-income"
+            id="typeBtnIncome"
+            type="button"
+            aria-pressed="true"
+            onclick="setType('income')"
+          >📥 Pemasukan</button>
+          <button
+            class="type-btn"
+            id="typeBtnExpense"
+            type="button"
+            aria-pressed="false"
+            onclick="setType('expense')"
+          >📤 Pengeluaran</button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" id="btnCancel" type="button">Batal</button>
+        <button class="btn-submit" id="btnSubmit" type="button">Simpan Transaksi</button>
+      </div>
+
+    </div>
+  </div>
+  <!-- /modal -->
+
+  <!-- ============================================================
+    MODAL EDIT TARGET TABUNGAN
+    Form isian nominal terkumpul baru + live preview progress bar
+  ============================================================ -->
+  <div class="overlay" id="editTargetOverlay" role="dialog" aria-modal="true" aria-labelledby="editTargetTitle">
+    <div class="modal">
+
+      <div class="modal-header">
+        <div class="modal-title" id="editTargetTitle">✏️ Edit Target</div>
+        <button class="btn-close-modal" id="btnCloseEdit" aria-label="Tutup">✕</button>
+      </div>
+
+      <!-- Info target -->
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--muted);">
+        Target: <strong id="editTargetMax" style="color:var(--text);"></strong>
+      </div>
+
+      <!-- Input nominal terkumpul baru -->
+      <div class="form-group">
+        <label class="form-label" for="editTargetInput">Nominal Terkumpul Baru (Rp)</label>
+        <input
+          type="number"
+          class="form-input"
+          id="editTargetInput"
+          placeholder="cth: 3000000"
+          min="0"
+          step="10000"
+        />
+        <!-- Index disimpan tersembunyi -->
+        <input type="hidden" id="editTargetIndex" value="0" />
+      </div>
+
+      <!-- Live preview progress bar kapsul -->
+      <div style="margin-bottom:6px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
+          <span style="color:var(--muted);">Preview Progress</span>
+          <strong id="editPreviewPct" style="color:var(--blue);">0%</strong>
+        </div>
+        <!-- Progress bar kapsul preview — lebar diset JS saat input berubah -->
+        <div class="target-bar-track">
+          <div
+            id="editPreviewFill"
+            class="target-bar-fill"
+            style="width:0%;background:linear-gradient(90deg,var(--blue),#60A5FA);"
+          ></div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px;" id="editPreviewNom">—</div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" id="btnCancelEdit" type="button">Batal</button>
+        <button class="btn-submit" id="btnSaveEdit" type="button">💾 Simpan</button>
+      </div>
+
+    </div>
+  </div>
+  <!-- /modal edit target -->
+
+  <!-- ============================================================
+    MODAL TAMBAH TARGET TABUNGAN
+    Form: Nama Target + Nominal Target
+  ============================================================ -->
+  <div class="overlay" id="addTargetOverlay" role="dialog" aria-modal="true" aria-labelledby="addTargetModalTitle">
+    <div class="modal">
+
+      <div class="modal-header">
+        <div class="modal-title" id="addTargetModalTitle">🎯 Tambah Target Baru</div>
+        <button class="btn-close-modal" id="btnCloseAddTarget" aria-label="Tutup">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="newTargetNama">Nama Target</label>
+        <input
+          type="text"
+          class="form-input"
+          id="newTargetNama"
+          placeholder="cth: Beli Motor, Liburan Jepang…"
+          maxlength="60"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="newTargetNominal">Nominal Target (Rp)</label>
+        <input
+          type="number"
+          class="form-input"
+          id="newTargetNominal"
+          placeholder="cth: 5000000"
+          min="1"
+          step="100000"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="newTargetEmoji">Ikon (emoji)</label>
+        <input
+          type="text"
+          class="form-input"
+          id="newTargetEmoji"
+          placeholder="🎯"
+          maxlength="2"
+        />
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" id="btnCancelAddTarget" type="button">Batal</button>
+        <button class="btn-submit" id="btnSaveAddTarget" type="button">＋ Simpan Target</button>
+      </div>
+
+    </div>
+  </div>
+  <!-- /modal tambah target -->
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer" aria-live="assertive" aria-atomic="true"></div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
